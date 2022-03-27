@@ -16,11 +16,6 @@ namespace Files.Models
         public string Specialization { get; set; }
         public string Subspecialization { get; set; }
         public DateTime? CreatedOn { get; set; }
-        public string FilePath { get; set; }
-
-
-        public string Extension { get; set; }
-        public string FileType { get; set; }
         public Author Author { get; set; }
     }
 }

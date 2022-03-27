@@ -19,71 +19,117 @@ namespace Files.Controllers
         {
             this.context = context;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string name, string status, string specialization)
         {
             var fileUpload = await context.WPDs.ToListAsync();
+
+            /////
+            ///ToDo: data filter
+            ///
+
             ViewBag.Message = TempData["Message"];
             return View(fileUpload);
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> UploadFile(List<IFormFile> files, string description)
+        //{
+        //    foreach (var file in files)
+        //    {
+        //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
+        //        bool basePathExists = System.IO.Directory.Exists(basePath);
+        //        if (!basePathExists) Directory.CreateDirectory(basePath);
+        //        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+        //        var filePath = Path.Combine(basePath, file.FileName);
+        //        var extension = Path.GetExtension(file.FileName);
+        //        if (!System.IO.File.Exists(filePath))
+        //        {
+        //            using (var stream = new FileStream(filePath, FileMode.Create))
+        //            {
+        //                await file.CopyToAsync(stream);
+        //            }
+        //            var fileModel = new WPD
+        //            {
+        //                CreatedOn = DateTime.UtcNow,
+        //                FileType = file.ContentType,
+        //                Extension = extension,
+        //                Name = fileName,
+        //                FilePath = filePath
+        //            };
+        //            context.WPDs.Add(fileModel);
+        //            context.SaveChanges();
+        //        }
+        //    }
+        //    TempData["Message"] = "File successfully uploaded to File System.";
+        //    return RedirectToAction("Index");
+        //}
+
+        //public async Task<IActionResult> DownloadFile(int id)
+        //{
+        //    var file = await context.WPDs.Where(x => x.Id == id).FirstOrDefaultAsync();
+        //    if (file == null) return null;
+        //    var memory = new MemoryStream();
+        //    using (var stream = new FileStream(file.FilePath, FileMode.Open))
+        //    {
+        //        await stream.CopyToAsync(memory);
+        //    }
+        //    memory.Position = 0;
+        //    return File(memory, file.FileType, file.Name + file.Extension);
+        //}
+
+        //public async Task<IActionResult> DeleteFile(int id)
+        //{
+
+        //    var file = await context.WPDs.Where(x => x.Id == id).FirstOrDefaultAsync();
+        //    if (file == null) return null;
+        //    if (System.IO.File.Exists(file.FilePath))
+        //    {
+        //        System.IO.File.Delete(file.FilePath);
+        //    }
+        //    context.WPDs.Remove(file);
+        //    context.SaveChanges();
+        //    TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
+        //    return RedirectToAction("Index");
+        //}
+
+        public IActionResult Create()
+        {
+            var wpd = new WPD();
+            return View(wpd);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> UploadFile(List<IFormFile> files, string description)
+        public async Task<IActionResult> Create(IFormFile file, WPD wpd)
         {
-            foreach (var file in files)
+            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
+            //bool basePathExists = System.IO.Directory.Exists(basePath);
+            //if (!basePathExists) Directory.CreateDirectory(basePath);
+            //var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+            var filePath = Path.Combine(basePath, file.FileName);
+
+            if (!System.IO.File.Exists(filePath))
             {
-                var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
-                bool basePathExists = System.IO.Directory.Exists(basePath);
-                if (!basePathExists) Directory.CreateDirectory(basePath);
-                var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                var filePath = Path.Combine(basePath, file.FileName);
-                var extension = Path.GetExtension(file.FileName);
-                if (!System.IO.File.Exists(filePath))
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-                    var fileModel = new WPD
-                    {
-                        CreatedOn = DateTime.UtcNow,
-                        FileType = file.ContentType,
-                        Extension = extension,
-                        Name = fileName,
-                        FilePath = filePath
-                    };
-                    context.WPDs.Add(fileModel);
-                    context.SaveChanges();
+                    await file.CopyToAsync(stream);
                 }
+
+                var newWpd = new WPD
+                {
+                    CreatedOn = DateTime.UtcNow,
+                    DateOfApproval = wpd.DateOfApproval,
+                    DateOfFormalApproval = wpd.DateOfFormalApproval,
+                    Specialization = wpd.Specialization,
+                    Subspecialization = wpd.Subspecialization,
+                    Status = wpd.Status,
+                    Year = wpd.Year,
+                    Name = wpd.Name
+                };
+                context.WPDs.Add(newWpd);
+                context.SaveChanges();
             }
+
             TempData["Message"] = "File successfully uploaded to File System.";
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> DownloadFile(int id)
-        {
-            var file = await context.WPDs.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(file.FilePath, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
-            memory.Position = 0;
-            return File(memory, file.FileType, file.Name + file.Extension);
-        }
-
-        public async Task<IActionResult> DeleteFile(int id)
-        {
-
-            var file = await context.WPDs.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            if (System.IO.File.Exists(file.FilePath))
-            {
-                System.IO.File.Delete(file.FilePath);
-            }
-            context.WPDs.Remove(file);
-            context.SaveChanges();
-            TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
             return RedirectToAction("Index");
         }
     }
