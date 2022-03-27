@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Files.Models
 {
-    public class MyContext: DbContext
+    public class FileContext : DbContext
     {
-        public MyContext(DbContextOptions options)
+        public FileContext(DbContextOptions options)
             : base(options) { }
 
-        public DbSet<FileModel> Files { get; set; }
+        public DbSet<WPD> WPDs { get; set; }
+        public DbSet<Author> Authors { get; set; }
     }
 }
