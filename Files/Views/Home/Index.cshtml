@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WPD>
+﻿@model WpdListViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -17,9 +17,15 @@
     <div class="col-sm-2">
         <form action="#" method="get">
             <div class="form-group">
-                <label >asdasd</label>
-                <input type="text" name="name" value="" />
+                <label class="control-label">что-то1: </label>
+                <input name="name" class="form-control" />
             </div>
+            <div class="form-group">
+                <label class="control-label">что-то2: </label>
+                <select name="smth" asp-items="Model.Authors" class="form-control"></select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:49%">Filter</button>
+            <a class="btn btn-success" asp-controller="#" asp-action="#" style="width:49%">Create Author</a>
         </form>
     </div>
     <div class="col-sm-10">
@@ -28,7 +34,7 @@
         <hr />
 
         <h4>Files on File System</h4>
-        @if (Model.Count() == 0)
+        @if (Model.WPDs.Count() == 0)
         {
             <div class="text-center">No Records Found</div>
         }
@@ -39,7 +45,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Name</th>
+                        <th>Дисциплина</th>
                         <th>дата утверждения</th>
                         <th>дата формального утверждения</th>
                         <th>Статус</th>
@@ -49,7 +55,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var file in Model)
+                    @foreach (var file in Model.WPDs)
                     {
                     <tr>
                         <th>@file.Id</th>

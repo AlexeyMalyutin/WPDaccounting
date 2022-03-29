@@ -1,6 +1,8 @@
 ﻿using Files.Models;
+using Files.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -19,16 +21,31 @@ namespace Files.Controllers
         {
             this.context = context;
         }
-        public async Task<IActionResult> Index(string name, string status, string specialization)
+        public IActionResult Index(string name, int? smthId)
         {
-            var fileUpload = await context.WPDs.ToListAsync();
+            IQueryable<WPD> wpds = context.WPDs;
 
-            /////
-            ///ToDo: data filter
-            ///
+            if(!string.IsNullOrEmpty(name))
+            {
+                wpds = wpds.Where(x=>x.Name.Contains(name)==true);
+            }
+
+            if(smthId != 0 && smthId!=null)
+            {
+                wpds = wpds.Where(x => x.Id == smthId);
+            }
+
+            var smth = context.WPDs.ToList();
+
+            var viewModel = new WpdListViewModel
+            {
+                WPDs = wpds,
+                Name = name,
+                Authors = new SelectList(smth, "Id", "Name")
+            };
 
             ViewBag.Message = TempData["Message"];
-            return View(fileUpload);
+            return View(viewModel);
         }
 
         //[HttpPost]
