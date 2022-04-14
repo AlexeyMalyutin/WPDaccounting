@@ -13,5 +13,8 @@ namespace Files.Models
         public string Patronymic { get; set; }
         public int Department { get; set; }
         public ICollection<WPD> WPDs { get; set; }
+
+
+        public string Name => $"{LastName} {FirstName[0]}. {Patronymic[0]}.";
     }
 }

@@ -62,13 +62,7 @@ namespace Files.Migrations
                     b.Property<DateTime?>("DateOfFormalApproval")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Extension")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")

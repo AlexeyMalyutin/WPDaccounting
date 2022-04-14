@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,5 +19,6 @@ namespace Files.Models
         public string Subspecialization { get; set; }
         public DateTime? CreatedOn { get; set; }
         public Author Author { get; set; }
+        public string FilePath { get; set; }
     }
 }

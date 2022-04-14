@@ -8,35 +8,44 @@
 <hr />
 @if (ViewBag.Message != null)
 {
-    <div class="alert alert-success alert-dismissible">
-        @ViewBag.Message
-    </div>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Инфо: </strong>@ViewBag.Message
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 }
 
 <div class="row">
     <div class="col-sm-2">
         <form action="#" method="get">
             <div class="form-group">
-                <label class="control-label">что-то1: </label>
+                <label class="control-label">Дисциплина: </label>
                 <input name="name" class="form-control" />
             </div>
             <div class="form-group">
-                <label class="control-label">что-то2: </label>
-                <select name="smth" asp-items="Model.Authors" class="form-control"></select>
+                <label class="control-label">Автор: </label>
+                <select name="authorId" asp-for="Author.Id" asp-items="Model.Authors" class="form-control">
+                    <option style="display:none"></option>
+                </select>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:49%">Filter</button>
-            <a class="btn btn-success" asp-controller="#" asp-action="#" style="width:49%">Create Author</a>
+            <div class="form-group">
+                <label class="control-label">Статус: </label>
+                <select name="status" asp-items="Model.Statuses" class="form-control">
+                    <option style="display:none"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a class="btn btn-success" asp-controller="Author" asp-action="Create">Create Author</a>
         </form>
     </div>
     <div class="col-sm-10">
-        <a type="button" class="btn btn-primary" asp-controller="Home" asp-action="Create">Upload new file</a>
-            
         <hr />
-
         <h4>Files on File System</h4>
         @if (Model.WPDs.Count() == 0)
         {
             <div class="text-center">No Records Found</div>
+            <a type="button" class="btn btn-primary align-items-center" asp-controller="Home" asp-action="Create">Upload new file</a>
         }
         else
         {
@@ -46,30 +55,33 @@
                     <tr>
                         <th>#</th>
                         <th>Дисциплина</th>
+                        <th>Автор</th>
                         <th>дата утверждения</th>
                         <th>дата формального утверждения</th>
                         <th>Статус</th>
                         <th>Специальность</th>
                         <th>Профиль</th>
-                        <th>Actions</th>
+                        <th><a type="button" class="btn btn-primary" asp-controller="Home" asp-action="Create">Upload new file</a></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var file in Model.WPDs)
                     {
-                    <tr>
-                        <th>@file.Id</th>
-                        <td>@file.Name</td>
-                        <td>@file.DateOfApproval</td>
-                        <td>@file.DateOfFormalApproval</td>
-                        <td>@file.Status</td>
-                        <td>@file.Specialization</td>
-                        <td>@file.Subspecialization</td>
-                        <td>
-                            <a type="button" class="btn btn-primary" asp-controller="Home" asp-action="DownloadFile" asp-route-id="@file.Id">Download</a>
-                            <a type="button" class="btn btn-danger" asp-controller="Home" asp-action="DeleteFile" asp-route-id="@file.Id">Delete</a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <th>@file.Id</th>
+                            <td>@file.Name</td>
+                            <td>@file.Author.Name</td>
+                            <td>@file.DateOfApproval</td>
+                            <td>@file.DateOfFormalApproval</td>
+                            <td>@file.Status</td>
+                            <td>@file.Specialization</td>
+                            <td>@file.Subspecialization</td>
+                            <td class="row">
+                                <a type="button" class="btn btn-primary m-1" asp-controller="Home" asp-action="Edit" asp-route-id="@file.Id"><i class="fa fa-marker fa-lg"></i></a>
+                                <a type="button" class="btn btn-primary m-1" asp-controller="Home" asp-action="DownloadFile" asp-route-id="@file.Id"><i class="fa fa-download fa-lg"></i></a>
+                                <a type="button" class="btn btn-danger m-1" asp-controller="Home" asp-action="DeleteFile" asp-route-id="@file.Id"><i class="fa fa-trash-alt fa-lg"></i></a>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>

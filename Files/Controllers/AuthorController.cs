@@ -1,4 +1,5 @@
 ﻿using Files.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,87 @@ namespace Files.Controllers
         {
             this.context = context;
         }
+        public ActionResult Index()
+        {
+            var authors = context.Authors.ToList();
+            return View(authors);
+        }
 
+        // GET: AuthorController/Details/5
+        public ActionResult Details(int id)
+        {
+            return View();
+        }
 
+        // GET: AuthorController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Author author)
+        {
+            try
+            {
+                context.Add(author);
+                context.SaveChanges();
+                return RedirectToAction(nameof(Index), "Home");
+            }
+            catch
+            {
+                return View();
+            }
+            
+        }
+
+        // GET: AuthorController/Edit/5
+        public ActionResult Edit(int id)
+        {
+            var author = context.Authors.Find(id);
+            return View(author);
+        }
+
+        // POST: AuthorController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Author author)
+        {
+            try
+            {
+                context.Authors.Update(author);
+                context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: AuthorController/Delete/5
+        public ActionResult Delete(int id)
+        {
+            var author = context.Authors.Find(id);
+            context.Authors.Remove(author);
+            context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: AuthorController/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete(Author author)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
     }
 }
