@@ -4,6 +4,16 @@
     ViewData["Title"] = "Create";
 }
 
+@if (ViewBag.IsFailed)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Автор с такими данными уже добавлен!</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
 <h1>Create</h1>
 
 <h4>Author</h4>

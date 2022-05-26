@@ -28,8 +28,9 @@ namespace Files.Controllers
         }
 
         // GET: AuthorController/Create
-        public ActionResult Create()
+        public ActionResult Create(bool isFailed = false)
         {
+            ViewBag.IsFailed = isFailed;
             return View();
         }
 
@@ -37,6 +38,16 @@ namespace Files.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(Author author)
         {
+            var isFailed = context.Authors.Any(
+                i => i.FirstName == author.FirstName &&
+                i.LastName == author.LastName &&
+                i.Patronymic == author.Patronymic &&
+                i.Department == author.Department);
+
+            if (isFailed)
+            {
+                return RedirectToAction(nameof(Create), new { isFailed = true });
+            }
             try
             {
                 context.Add(author);

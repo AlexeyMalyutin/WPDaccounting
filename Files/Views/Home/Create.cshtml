@@ -22,12 +22,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="AuthorId" class="control-label"></label>
-                <select asp-for="AuthorId" name="AuthorId" asp-items="ViewBag.Authors" class="form-control"></select>
+                <select asp-for="AuthorId" asp-items="ViewBag.Authors" class="form-control"></select>
                 <span asp-validation-for="AuthorId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
+                <select asp-for="Status" asp-items="ViewBag.Statuses" class="form-control"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -47,13 +47,30 @@
             </div>
             <div class="form-group">
                 <label asp-for="Specialization" class="control-label"></label>
-                <input asp-for="Specialization" class="form-control" />
+                <select asp-for="Specialization" asp-items="ViewBag.Specializations" class="form-control">
+                </select>
                 <span asp-validation-for="Specialization" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Subspecialization" class="control-label"></label>
-                <input asp-for="Subspecialization" class="form-control" />
+                <select asp-for="Subspecialization" asp-items="ViewBag.Subspecializations" class="form-control">
+                </select>
                 <span asp-validation-for="Subspecialization" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check form-switch">
+                <input asp-for="isPrinted" class="form-check-input"/>
+                <label asp-for="isPrinted" class="form-check-label"></label>
+                <span asp-validation-for="isPrinted" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="isTitlePrinted" class="form-check-input"/>
+                <label asp-for="isTitlePrinted" class="form-check-label"></label>
+                <span asp-validation-for="isTitlePrinted" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="isSigned" class="form-check-input"/>
+                <label asp-for="isSigned" class="form-check-label"></label>
+                <span asp-validation-for="isSigned" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -70,4 +87,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
 }

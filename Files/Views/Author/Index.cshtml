@@ -22,7 +22,7 @@
                 @Html.DisplayNameFor(model => model.Department)
             </th>
             <th>
-                <a class="btn btn-outline-success" asp-action="Create"><i class="far fa-plus-square"></i> Create</a>
+                <a class="btn btn-outline-success" asp-action="Create"><i class="far fa-plus-square"></i>Добавить</a>
             </th>
         </tr>
     </thead>
@@ -43,7 +43,8 @@
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id"><i class="fa fa-marker fa-lg"></i></a> |
-                <a asp-action="Delete" asp-route-id="@item.Id" class="text-danger ml-1" onclick="return confirm('Are you sure to delete this record?')">
+                <a asp-action="Delete" asp-route-id="@item.Id" class="text-danger ml-1" 
+                   onclick="if (confirm('Are you sure to delete this record?')) return confirm('Are you REALLY sure to DELETE IT?')">
                     <i class="fa fa-trash-alt fa-lg"></i>
                 </a>
             </td>

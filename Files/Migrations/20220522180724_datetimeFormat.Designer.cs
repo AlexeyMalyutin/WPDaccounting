@@ -4,14 +4,16 @@ using Files.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Files.Migrations
 {
     [DbContext(typeof(FileContext))]
-    partial class MyContextModelSnapshot : ModelSnapshot
+    [Migration("20220522180724_datetimeFormat")]
+    partial class datetimeFormat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,6 +58,9 @@ namespace Files.Migrations
                     b.Property<int?>("AuthorId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateOfApproval")
                         .HasColumnType("datetime2");
 
@@ -84,15 +89,6 @@ namespace Files.Migrations
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
-
-                    b.Property<bool>("isPrinted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isSigned")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isTitlePrinted")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

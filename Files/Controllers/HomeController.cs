@@ -21,13 +21,14 @@ namespace Files.Controllers
         {
             this.context = context;
         }
-        public IActionResult Index(string name, int? authorId, string status)
+        public IActionResult Index(string name, int? authorId, string status, string specialization, 
+            string subspecialization, bool? isPrinted, bool? isTitlePrinted, bool? isSigned)
         {
             IQueryable<WPD> wpds = context.WPDs.Include(a => a.Author);
 
-            if (!string.IsNullOrEmpty(name))
+            if (name!=null)
             {
-                wpds = wpds.Where(x => x.Name.Contains(name) == true);
+                wpds = wpds.Where(x => x.Name == name);
             }
 
             if(authorId != 0 && authorId != null)
@@ -40,54 +41,52 @@ namespace Files.Controllers
                 wpds = wpds.Where(x => x.Status == status);
             }
 
+            if(specialization!=null)
+            {
+                wpds = wpds.Where(x => x.Specialization == specialization);
+            }
+
+            if(subspecialization!=null)
+            {
+                wpds = wpds.Where(x => x.Subspecialization == subspecialization);
+            }
+
+            if(isPrinted!=null)
+            {
+                wpds = wpds.Where(x => x.IsPrinted == isPrinted);
+            }
+
+            if (isTitlePrinted != null)
+            {
+                wpds = wpds.Where(x => x.IsTitlePrinted == isTitlePrinted);
+            }
+
+            if (isSigned != null)
+            {
+                wpds = wpds.Where(x => x.IsSigned == isSigned);
+            }
+
             var authors = context.Authors.ToList();
-            var statuses = context.WPDs.Select(x => x.Status).ToList();
+            var statuses = context.WPDs.Select(x => x.Status).Distinct().ToList();
+            var disciplines = context.WPDs.Select(x => x.Name).Distinct().ToList();
+            var specializations = context.WPDs.Select(x => x.Specialization).Distinct().ToList();
+            var subspecializations = context.WPDs.Select(x => x.Subspecialization).Distinct().ToList();
 
             var viewModel = new WpdListViewModel
             {
                 WPDs = wpds,
                 Name = name,
                 Authors = new SelectList(authors, "Id", "Name"),
-                Statuses = new SelectList(statuses)
+                Statuses = new SelectList(statuses),
+                Disciplines = new SelectList(disciplines),
+                Specializations = new SelectList(specializations),
+                Subspecializations = new SelectList(subspecializations)
             };
 
             //authors.Insert(0, new Author { FirstName = "all", LastName=" ",Patronymic=" ", Id = 0 });
             ViewBag.Message = TempData["Message"];
             return View(viewModel);
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> UploadFile(List<IFormFile> files, string description)
-        //{
-        //    foreach (var file in files)
-        //    {
-        //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
-        //        bool basePathExists = System.IO.Directory.Exists(basePath);
-        //        if (!basePathExists) Directory.CreateDirectory(basePath);
-        //        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-        //        var filePath = Path.Combine(basePath, file.FileName);
-        //        var extension = Path.GetExtension(file.FileName);
-        //        if (!System.IO.File.Exists(filePath))
-        //        {
-        //            using (var stream = new FileStream(filePath, FileMode.Create))
-        //            {
-        //                await file.CopyToAsync(stream);
-        //            }
-        //            var fileModel = new WPD
-        //            {
-        //                CreatedOn = DateTime.UtcNow,
-        //                FileType = file.ContentType,
-        //                Extension = extension,
-        //                Name = fileName,
-        //                FilePath = filePath
-        //            };
-        //            context.WPDs.Add(fileModel);
-        //            context.SaveChanges();
-        //        }
-        //    }
-        //    TempData["Message"] = "File successfully uploaded to File System.";
-        //    return RedirectToAction("Index");
-        //}
 
         public async Task<IActionResult> DownloadFile(int id)
         {
@@ -107,7 +106,36 @@ namespace Files.Controllers
         public IActionResult Create()
         {
             var authors = context.Authors.ToList();
+            var statuses = new List<string>();
+            var specializations = new List<string>();
+            var subspecializations = new List<string>();
+            using (var file = new StreamReader("statuses.txt"))
+            {
+                while (!file.EndOfStream)
+                {
+                    statuses.Add(file.ReadLine());
+                }
+            }
+            using (var file = new StreamReader("specializations.txt"))
+            {
+                while (!file.EndOfStream)
+                {
+                    specializations.Add(file.ReadLine());
+                }
+            }
+            using (var file = new StreamReader("subspecializations.txt"))
+            {
+                while (!file.EndOfStream)
+                {
+                    subspecializations.Add(file.ReadLine());
+                }
+            }
+
             ViewBag.Authors = new SelectList(authors, "Id", "Name");
+            ViewBag.Statuses = new SelectList(statuses);
+            ViewBag.Specializations = new SelectList(specializations);
+            ViewBag.Subspecializations = new SelectList(subspecializations);
+
             return View();
         }
 
@@ -116,7 +144,7 @@ namespace Files.Controllers
         {
             if (wpdModel.File != null)
             {
-                var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(),"Files");
                 var filePath = Path.Combine(basePath, wpdModel.File.FileName);
 
                 if (!System.IO.File.Exists(filePath))
@@ -128,7 +156,6 @@ namespace Files.Controllers
 
                     var wpd = new WPD
                     {
-                        CreatedOn = DateTime.UtcNow,
                         DateOfApproval = wpdModel.DateOfApproval,
                         DateOfFormalApproval = wpdModel.DateOfFormalApproval,
                         Specialization = wpdModel.Specialization,
@@ -137,6 +164,9 @@ namespace Files.Controllers
                         Year = wpdModel.Year,
                         Name = wpdModel.Name,
                         Author = context.Authors.Find(wpdModel.AuthorId),
+                        IsPrinted = wpdModel.isPrinted,
+                        IsTitlePrinted = wpdModel.isTitlePrinted,
+                        IsSigned = wpdModel.isSigned,
                         FilePath = filePath
                     };
                     context.WPDs.Add(wpd);
@@ -146,7 +176,6 @@ namespace Files.Controllers
             TempData["Message"] = "File successfully uploaded to File System.";
             return RedirectToAction("Index");
         }
-
 
         public async Task<IActionResult> DeleteFile(int id)
         {
@@ -163,10 +192,82 @@ namespace Files.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Edit(int id)
+        public IActionResult Edit(int? id)
         {
-            var wpd = context.WPDs.Find(id);
-            return View(wpd);
+            if(id==null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            var wpd = context.WPDs.Include(x => x.Author).Where(y => y.Id == id).FirstOrDefault();
+            var authors = context.Authors.ToList();
+            ViewBag.Authors = new SelectList(authors, "Id", "Name");
+            var wpdEdit = new WpdCreateViewModel
+            {
+                AuthorId = wpd.Author.Id,
+                DateOfApproval = wpd.DateOfApproval,
+                isPrinted = wpd.IsPrinted,
+                isSigned = wpd.IsSigned,
+                isTitlePrinted = wpd.IsTitlePrinted,
+                Name = wpd.Name,
+                Specialization = wpd.Specialization,
+                Status = wpd.Status,
+                Subspecialization = wpd.Subspecialization,
+                Year = wpd.Year,
+                DateOfFormalApproval = wpd.DateOfFormalApproval
+            };
+            return View(wpdEdit);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(WpdCreateViewModel wpdToElit, int id)
+        {
+            if(ModelState.IsValid)
+            {
+                var fileToDelete = context.WPDs.Find(id);
+                context.WPDs.Remove(fileToDelete);
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(),"Files",fileToDelete.FilePath);
+                var fileInfo = new FileInfo(filepath);
+                if(fileInfo.Exists)
+                {
+                    System.IO.File.Delete(filepath);
+                    fileInfo.Delete();
+                }
+            }
+
+            try
+            {
+
+                var fileToUpload = Path.Combine(Directory.GetCurrentDirectory(), "Files", wpdToElit.File.FileName);
+                using (var stream = new FileStream(fileToUpload, FileMode.Create))
+                {
+                    wpdToElit.File.CopyTo(stream);
+                }
+
+                var wpd = new WPD
+                {
+                    DateOfApproval = wpdToElit.DateOfApproval,
+                    Specialization = wpdToElit.Specialization,
+                    Subspecialization = wpdToElit.Subspecialization,
+                    Status = wpdToElit.Status,
+                    Year = wpdToElit.Year,
+                    Name = wpdToElit.Name,
+                    Author = context.Authors.Find(wpdToElit.AuthorId),
+                    IsPrinted = wpdToElit.isPrinted,
+                    IsTitlePrinted = wpdToElit.isTitlePrinted,
+                    IsSigned = wpdToElit.isSigned,
+                    FilePath = fileToUpload,
+                    DateOfFormalApproval = wpdToElit.DateOfFormalApproval
+                };
+
+                context.WPDs.Update(wpd);
+                context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Uploading Files</h1>
+<h1>Таблица с РПД</h1>
 <hr />
 @if (ViewBag.Message != null)
 {
@@ -20,23 +20,37 @@
     <div class="col-sm-2">
         <form action="#" method="get">
             <div class="form-group">
-                <label class="control-label">Дисциплина: </label>
-                <input name="name" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label class="control-label">Автор: </label>
-                <select name="authorId" asp-for="Author.Id" asp-items="Model.Authors" class="form-control">
-                    <option style="display:none"></option>
+                <label class="control-label" asp-for="Name"></label>
+                <select id="name" name="name" asp-items="Model.Disciplines" class="form-control">
+                    <option style="display:none">&nbsp;</option>
                 </select>
             </div>
             <div class="form-group">
-                <label class="control-label">Статус: </label>
-                <select name="status" asp-items="Model.Statuses" class="form-control">
-                    <option style="display:none"></option>
+                <label class="control-label" asp-for="Author.Name"></label>
+                <select id="authorId" name="authorId" asp-items="Model.Authors" class="form-control">
+                    <option style="display:none">&nbsp;</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a class="btn btn-success" asp-controller="Author" asp-action="Create">Create Author</a>
+            <div class="form-group">
+                <label class="control-label" asp-for="Status"></label>
+                <select id="status" name="status" asp-items="Model.Statuses" class="form-control">
+                    <option style="display:none">&nbsp;</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label" asp-for="Specializations"></label>
+                <select id="specialization" name="specialization" asp-items="Model.Specializations" class="form-control">
+                    <option style="display:none">&nbsp;</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label" asp-for="Subspecializations"></label>
+                <select id="subspecialization" name="subspecialization" asp-items="Model.Subspecializations" class="form-control">
+                    <option style="display:none">&nbsp;</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Поиск</button>
+            <a class="btn btn-success" asp-controller="Author" asp-action="Create">new author</a>
         </form>
     </div>
     <div class="col-sm-10">
@@ -45,7 +59,13 @@
         @if (Model.WPDs.Count() == 0)
         {
             <div class="text-center">No Records Found</div>
-            <a type="button" class="btn btn-primary align-items-center" asp-controller="Home" asp-action="Create">Upload new file</a>
+            <div class="container">
+                <div class="row">
+                    <div class="col text-center">
+                        <a type="button" class="btn btn-primary btn-lg btn-block" asp-controller="Home" asp-action="Create">Загрузить РПД</a>
+                    </div>
+                </div>
+            </div>
         }
         else
         {
@@ -56,35 +76,63 @@
                         <th>#</th>
                         <th>Дисциплина</th>
                         <th>Автор</th>
-                        <th>дата утверждения</th>
-                        <th>дата формального утверждения</th>
+                        <th>Дата утверждения</th>
+                        <th>Дата формального утверждения</th>
                         <th>Статус</th>
                         <th>Специальность</th>
                         <th>Профиль</th>
-                        <th><a type="button" class="btn btn-primary" asp-controller="Home" asp-action="Create">Upload new file</a></th>
+                        <th>Напечатан полностью</th>
+                        <th>Напечатан титульник</th>
+                        <th>Подпись преподавателя</th>
+                        <th><a class="btn btn-outline-success" asp-action="Create"><i class="far fa-plus-square"></i>РПД</a></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var file in Model.WPDs)
                     {
-                        <tr>
-                            <th>@file.Id</th>
-                            <td>@file.Name</td>
-                            <td>@file.Author.Name</td>
-                            <td>@file.DateOfApproval</td>
-                            <td>@file.DateOfFormalApproval</td>
-                            <td>@file.Status</td>
-                            <td>@file.Specialization</td>
-                            <td>@file.Subspecialization</td>
-                            <td class="row">
-                                <a type="button" class="btn btn-primary m-1" asp-controller="Home" asp-action="Edit" asp-route-id="@file.Id"><i class="fa fa-marker fa-lg"></i></a>
-                                <a type="button" class="btn btn-primary m-1" asp-controller="Home" asp-action="DownloadFile" asp-route-id="@file.Id"><i class="fa fa-download fa-lg"></i></a>
-                                <a type="button" class="btn btn-danger m-1" asp-controller="Home" asp-action="DeleteFile" asp-route-id="@file.Id"><i class="fa fa-trash-alt fa-lg"></i></a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <th>@file.Id</th>
+                        <td>@file.Name</td>
+                        <td>@file.Author.Name</td>
+                        <td>@Html.DisplayFor(modelItem => file.DateOfApproval)</td>
+                        <td>@Html.DisplayFor(modelItem => file.DateOfFormalApproval)</td>
+                        <td>@file.Status</td>
+                        <td>@file.Specialization</td>
+                        <td>@file.Subspecialization</td>
+                        <td>@(file.IsPrinted ? "Да" : "Нет")</td>
+                        <td>@(file.IsTitlePrinted ? "Да" : "Нет")</td>
+                        <td>@(file.IsSigned ? "Да" : "Нет")</td>
+                        <td class="row" width="200px">
+                            <a type="button" class="btn btn-primary m-1" asp-controller="Home" asp-action="Edit" asp-route-id="@file.Id"><i class="fa fa-marker fa-lg"></i></a>
+                            <a type="button" class="btn btn-primary m-1" asp-controller="Home" asp-action="DownloadFile" asp-route-id="@file.Id"><i class="fa fa-download fa-lg"></i></a>
+                            <a type="button" class="btn btn-danger m-1" onclick="return (confirm('Вы точно хотите удалить этот документ?') ? confirm('ВЫ УВЕРЕНЫ?') : false);" 
+                               asp-controller="Home" asp-action="DeleteFile" asp-route-id="@file.Id"><i class="fa fa-trash-alt fa-lg"></i></a>
+                        </td>
+                    </tr>
                     }
                 </tbody>
             </table>
         }
     </div>
 </div>
+
+@section Scripts{ 
+    <script type="text/javascript">
+        $(function () {
+            $("#name").chosen();
+            $("#authorId").chosen();
+            $("#status").chosen();
+            $("#specialization").chosen();
+            $("#subspecialization").chosen();
+        });
+    </script>
+
+    <script type="text/javascript">
+        function confirmToDelete() {
+            if (confirm('Вы точно хотите удалить этот документ?')) {
+                return confirm('ВЫ УВЕРЕНЫ?');
+            }
+            return false;
+        }
+    </script>
+}
