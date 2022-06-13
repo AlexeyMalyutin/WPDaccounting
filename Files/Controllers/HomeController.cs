@@ -215,57 +215,72 @@ namespace Files.Controllers
                 Year = wpd.Year,
                 DateOfFormalApproval = wpd.DateOfFormalApproval
             };
+            ViewBag.CurrentFile = Path.GetFileName(wpd.FilePath);
             return View(wpdEdit);
         }
 
         [HttpPost]
         public IActionResult Edit(WpdCreateViewModel wpdToElit, int id)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var fileToDelete = context.WPDs.Find(id);
-                context.WPDs.Remove(fileToDelete);
-                var filepath = Path.Combine(Directory.GetCurrentDirectory(),"Files",fileToDelete.FilePath);
-                var fileInfo = new FileInfo(filepath);
-                if(fileInfo.Exists)
+                var fileToDelete = context.WPDs.Find(id); //include author
+                if (wpdToElit.File != null)
                 {
-                    System.IO.File.Delete(filepath);
-                    fileInfo.Delete();
-                }
-            }
-
-            try
-            {
-
-                var fileToUpload = Path.Combine(Directory.GetCurrentDirectory(), "Files", wpdToElit.File.FileName);
-                using (var stream = new FileStream(fileToUpload, FileMode.Create))
-                {
-                    wpdToElit.File.CopyTo(stream);
+                    //context.WPDs.Remove(fileToDelete);
+                    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Files", fileToDelete.FilePath);
+                    var fileInfo = new FileInfo(filepath);
+                    if (fileInfo.Exists)
+                    {
+                        System.IO.File.Delete(filepath);
+                        fileInfo.Delete();
+                    }
                 }
 
-                var wpd = new WPD
-                {
-                    DateOfApproval = wpdToElit.DateOfApproval,
-                    Specialization = wpdToElit.Specialization,
-                    Subspecialization = wpdToElit.Subspecialization,
-                    Status = wpdToElit.Status,
-                    Year = wpdToElit.Year,
-                    Name = wpdToElit.Name,
-                    Author = context.Authors.Find(wpdToElit.AuthorId),
-                    IsPrinted = wpdToElit.isPrinted,
-                    IsTitlePrinted = wpdToElit.isTitlePrinted,
-                    IsSigned = wpdToElit.isSigned,
-                    FilePath = fileToUpload,
-                    DateOfFormalApproval = wpdToElit.DateOfFormalApproval
-                };
 
-                context.WPDs.Update(wpd);
-                context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    //на NULL
+                    string fileToUpload = null;
+                    if (wpdToElit.File != null)
+                    {
+                        fileToUpload = Path.Combine(Directory.GetCurrentDirectory(), "Files", wpdToElit.File.FileName);
+                        using (var stream = new FileStream(fileToUpload, FileMode.Create))
+                        {
+                            wpdToElit.File.CopyTo(stream);
+                        }
+                    }
+
+                    fileToDelete.DateOfApproval = wpdToElit.DateOfApproval; //context.WPD.Update.....
+                    fileToDelete.Specialization = wpdToElit.Specialization;
+                    fileToDelete.Subspecialization = wpdToElit.Subspecialization;
+                    fileToDelete.Status = wpdToElit.Status;
+                    fileToDelete.Year = wpdToElit.Year;
+                    fileToDelete.Name = wpdToElit.Name;
+                    fileToDelete.Author = context.Authors.Find(wpdToElit.AuthorId);
+                    fileToDelete.IsPrinted = wpdToElit.isPrinted;
+                    fileToDelete.IsTitlePrinted = wpdToElit.isTitlePrinted;
+                    fileToDelete.IsSigned = wpdToElit.isSigned;
+                    fileToDelete.DateOfFormalApproval = wpdToElit.DateOfFormalApproval;
+
+                    if (wpdToElit.File != null)
+                    {
+                        fileToDelete.FilePath = fileToUpload;
+                    }
+
+
+                    context.WPDs.Update(fileToDelete);
+                    context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            catch(Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
                 return RedirectToAction(nameof(Index));
             }
         }

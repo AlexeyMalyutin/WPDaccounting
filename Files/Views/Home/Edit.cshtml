@@ -16,12 +16,21 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <input class="form-control-file" asp-for="File" type="file" multiple />
+                <label class="control-label">Текущий файл</label>
+                <input class="form-control" type="text" value="@ViewBag.CurrentFile" readonly />
             </div>
+
+            <div class="form-group">
+                @*<label class="control-label">Загрузить новый файл</label>*@
+                <input class="form-control-file" asp-for="File" type="file" style="color:transparent" multiple />
+            </div>
+
+
             <div class="form-group">
                 <label asp-for="AuthorId" class="control-label"></label>
-                <select asp-for="AuthorId" asp-items="ViewBag.Authors" class="form-control" ></select>
+                <select asp-for="AuthorId" asp-items="ViewBag.Authors" class="form-control"></select>
                 <span asp-validation-for="AuthorId" class="text-danger"></span>
             </div>
             <div class="form-group">

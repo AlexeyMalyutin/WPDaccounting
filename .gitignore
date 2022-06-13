@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Files/Files/страницыSRS.png
+/Files/Files/Лаба№7.mcl
+*.docx
+/Files/Files/М3О-324Б-19_Малютин_ПЧМИ_Презентация.pptx
