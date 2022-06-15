@@ -105,6 +105,7 @@ namespace Files.Controllers
 
         public IActionResult Create()
         {
+            //TempData["Message"] = null;
             var authors = context.Authors.ToList();
             var statuses = new List<string>();
             var specializations = new List<string>();
@@ -171,10 +172,15 @@ namespace Files.Controllers
                     };
                     context.WPDs.Add(wpd);
                     context.SaveChanges();
+                    TempData["Message"] = $"{wpdModel.File.FileName} successfully uploaded to File System.";
+                }
+                else
+                {
+
+                    TempData["Message"] = $"{wpdModel.File.FileName} УЖЕ БЫЛ ЗАГРУЖЕН!";
                 }
             }
-            TempData["Message"] = "File successfully uploaded to File System.";
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> DeleteFile(int id)
@@ -224,30 +230,36 @@ namespace Files.Controllers
         {
             if (ModelState.IsValid)
             {
-                var fileToDelete = context.WPDs.Find(id); //include author
-                if (wpdToElit.File != null)
-                {
-                    //context.WPDs.Remove(fileToDelete);
-                    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Files", fileToDelete.FilePath);
-                    var fileInfo = new FileInfo(filepath);
-                    if (fileInfo.Exists)
-                    {
-                        System.IO.File.Delete(filepath);
-                        fileInfo.Delete();
-                    }
-                }
-
-
                 try
                 {
-                    //на NULL
-                    string fileToUpload = null;
+                    var fileToDelete = context.WPDs.Find(id); //include author
+
                     if (wpdToElit.File != null)
                     {
-                        fileToUpload = Path.Combine(Directory.GetCurrentDirectory(), "Files", wpdToElit.File.FileName);
-                        using (var stream = new FileStream(fileToUpload, FileMode.Create))
+                        var fileToUpload = Path.Combine(Directory.GetCurrentDirectory(), "Files", wpdToElit.File.FileName);
+                        if (!System.IO.File.Exists(fileToUpload))
                         {
-                            wpdToElit.File.CopyTo(stream);
+
+                            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Files", fileToDelete.FilePath);
+                            var fileInfo = new FileInfo(filepath);
+
+                            if (fileInfo.Exists)
+                            {
+                                System.IO.File.Delete(filepath);
+                                fileInfo.Delete();
+                            }
+
+                            using (var stream = new FileStream(fileToUpload, FileMode.Create))
+                            {
+                                wpdToElit.File.CopyTo(stream);
+                            }
+
+                            fileToDelete.FilePath = fileToUpload;
+                        }
+                        else
+                        {
+                            TempData["Message"] = $"НЕ УДАЛОСЬ ИЗМЕНИТЬ ЗАПИСЬ!\nФайл {wpdToElit.File.FileName} УЖЕ СУЩЕСТВУЕТ!";
+                            return RedirectToAction(nameof(Index));
                         }
                     }
 
@@ -262,12 +274,6 @@ namespace Files.Controllers
                     fileToDelete.IsTitlePrinted = wpdToElit.isTitlePrinted;
                     fileToDelete.IsSigned = wpdToElit.isSigned;
                     fileToDelete.DateOfFormalApproval = wpdToElit.DateOfFormalApproval;
-
-                    if (wpdToElit.File != null)
-                    {
-                        fileToDelete.FilePath = fileToUpload;
-                    }
-
 
                     context.WPDs.Update(fileToDelete);
                     context.SaveChanges();

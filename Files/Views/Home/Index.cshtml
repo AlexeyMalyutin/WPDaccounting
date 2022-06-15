@@ -1,7 +1,7 @@
 ﻿@model WpdListViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "РПД";
 }
 
 <h1>Таблица с РПД</h1>
@@ -50,12 +50,11 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Поиск</button>
-            <a class="btn btn-success" asp-controller="Author" asp-action="Create">new author</a>
+            <a class="btn btn-success" asp-controller="Author" asp-action="Create"><i class="far fa-plus-square"></i> Преподаватель</a>
         </form>
     </div>
     <div class="col-sm-10">
-        <hr />
-        <h4>Files on File System</h4>
+        <h4>File System</h4>
         @if (Model.WPDs.Count() == 0)
         {
             <div class="text-center">No Records Found</div>
