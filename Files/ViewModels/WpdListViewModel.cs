@@ -25,10 +25,20 @@ namespace Files.ViewModels
         public SelectList Authors { get; set; }
         public SelectList Statuses { get; set; }
         public SelectList Disciplines { get; set; }
+
+        [Display(Name = "Специальность")]
         public SelectList Specializations { get; set; }
+
+        [Display(Name = "Профиль")]
         public SelectList Subspecializations { get; set; }
+
+        [Display(Name = "Напечатано полностью")]
         public bool IsPrinted { get; set; }
+
+        [Display(Name = "Напечатан титульник")]
         public bool IsTitlePrinted { get; set; }
+
+        [Display(Name = "Подпись преподавателя")]
         public bool IsSigned { get; set; }
 
     }

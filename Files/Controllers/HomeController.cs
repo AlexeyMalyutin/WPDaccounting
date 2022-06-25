@@ -83,7 +83,6 @@ namespace Files.Controllers
                 Subspecializations = new SelectList(subspecializations)
             };
 
-            //authors.Insert(0, new Author { FirstName = "all", LastName=" ",Patronymic=" ", Id = 0 });
             ViewBag.Message = TempData["Message"];
             return View(viewModel);
         }
