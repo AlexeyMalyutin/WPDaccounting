@@ -17,6 +17,9 @@ namespace Files.Controllers
     public class HomeController : Controller
     {
         private readonly FileContext context;
+        private const string statusesFilePath = "statuses.txt";
+        private const string specializationsFilePath = "specializations.txt";
+        private const string subspecializationsFilePath = "subspecializations.txt";
         public HomeController(FileContext context)
         {
             this.context = context;
@@ -109,21 +112,21 @@ namespace Files.Controllers
             var statuses = new List<string>();
             var specializations = new List<string>();
             var subspecializations = new List<string>();
-            using (var file = new StreamReader("statuses.txt"))
+            using (var file = new StreamReader(statusesFilePath))
             {
                 while (!file.EndOfStream)
                 {
                     statuses.Add(file.ReadLine());
                 }
             }
-            using (var file = new StreamReader("specializations.txt"))
+            using (var file = new StreamReader(specializationsFilePath))
             {
                 while (!file.EndOfStream)
                 {
                     specializations.Add(file.ReadLine());
                 }
             }
-            using (var file = new StreamReader("subspecializations.txt"))
+            using (var file = new StreamReader(subspecializationsFilePath))
             {
                 while (!file.EndOfStream)
                 {
