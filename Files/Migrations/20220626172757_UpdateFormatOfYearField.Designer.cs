@@ -4,14 +4,16 @@ using Files.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Files.Migrations
 {
     [DbContext(typeof(FileContext))]
-    partial class MyContextModelSnapshot : ModelSnapshot
+    [Migration("20220626172757_UpdateFormatOfYearField")]
+    partial class UpdateFormatOfYearField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

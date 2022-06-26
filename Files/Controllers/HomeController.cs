@@ -21,7 +21,7 @@ namespace Files.Controllers
         {
             this.context = context;
         }
-        public IActionResult Index(string name, int? authorId, string status, string specialization, 
+        public async Task<IActionResult> Index(string name, int? authorId, string status, string specialization, 
             string subspecialization, bool? isPrinted, bool? isTitlePrinted, bool? isSigned)
         {
             IQueryable<WPD> wpds = context.WPDs.Include(a => a.Author);
@@ -66,15 +66,15 @@ namespace Files.Controllers
                 wpds = wpds.Where(x => x.IsSigned == isSigned);
             }
 
-            var authors = context.Authors.ToList();
-            var statuses = context.WPDs.Select(x => x.Status).Distinct().ToList();
-            var disciplines = context.WPDs.Select(x => x.Name).Distinct().ToList();
-            var specializations = context.WPDs.Select(x => x.Specialization).Distinct().ToList();
-            var subspecializations = context.WPDs.Select(x => x.Subspecialization).Distinct().ToList();
+            var authors = await context.Authors.ToListAsync();
+            var statuses = await context.WPDs.Select(x => x.Status).Distinct().ToListAsync();
+            var disciplines = await context.WPDs.Select(x => x.Name).Distinct().ToListAsync();
+            var specializations = await context.WPDs.Select(x => x.Specialization).Distinct().ToListAsync();
+            var subspecializations = await context.WPDs.Select(x => x.Subspecialization).Distinct().ToListAsync();
 
             var viewModel = new WpdListViewModel
             {
-                WPDs = wpds,
+                WPDs = await wpds.ToListAsync(),
                 Name = name,
                 Authors = new SelectList(authors, "Id", "Name"),
                 Statuses = new SelectList(statuses),
@@ -102,10 +102,10 @@ namespace Files.Controllers
             return File(memory, "application/octet-stream", Path.GetFileName(wpd.FilePath));
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             //TempData["Message"] = null;
-            var authors = context.Authors.ToList();
+            var authors = await context.Authors.ToListAsync();
             var statuses = new List<string>();
             var specializations = new List<string>();
             var subspecializations = new List<string>();
@@ -169,8 +169,8 @@ namespace Files.Controllers
                         IsSigned = wpdModel.isSigned,
                         FilePath = filePath
                     };
-                    context.WPDs.Add(wpd);
-                    context.SaveChanges();
+                    await context.WPDs.AddAsync(wpd);
+                    await context.SaveChangesAsync();
                     TempData["Message"] = $"{wpdModel.File.FileName} successfully uploaded to File System.";
                 }
                 else
@@ -191,20 +191,20 @@ namespace Files.Controllers
             {
                 System.IO.File.Delete(wpd.FilePath);
                 context.WPDs.Remove(wpd);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             TempData["Message"] = $"Removed {wpd.Name} successfully from File System.";
             return RedirectToAction("Index");
         }
 
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if(id==null)
             {
                 return RedirectToAction(nameof(Index));
             }
-            var wpd = context.WPDs.Include(x => x.Author).Where(y => y.Id == id).FirstOrDefault();
-            var authors = context.Authors.ToList();
+            var wpd = await context.WPDs.Include(x => x.Author).Where(y => y.Id == id).FirstOrDefaultAsync();
+            var authors = await context.Authors.ToListAsync();
             ViewBag.Authors = new SelectList(authors, "Id", "Name");
             var wpdEdit = new WpdCreateViewModel
             {
@@ -225,13 +225,13 @@ namespace Files.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(WpdCreateViewModel wpdToElit, int id)
+        public async Task<IActionResult> Edit(WpdCreateViewModel wpdToElit, int id)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var fileToDelete = context.WPDs.Find(id); //include author
+                    var fileToDelete = await context.WPDs.FindAsync(id); //include author
 
                     if (wpdToElit.File != null)
                     {
@@ -275,7 +275,7 @@ namespace Files.Controllers
                     fileToDelete.DateOfFormalApproval = wpdToElit.DateOfFormalApproval;
 
                     context.WPDs.Update(fileToDelete);
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)

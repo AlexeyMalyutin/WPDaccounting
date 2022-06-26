@@ -1,6 +1,7 @@
 ﻿using Files.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,11 @@ namespace Files.Controllers
         {
             this.context = context;
         }
-        public ActionResult Index(bool isFailed = false)
+        public async Task<ActionResult> Index(bool isFailed = false)
         {
             ViewBag.IsFailed = isFailed;
             ViewBag.Message = TempData["Message"];
-            var authors = context.Authors.ToList();
+            var authors = await context.Authors.ToListAsync();
             return View(authors);
         }
 
@@ -32,7 +33,7 @@ namespace Files.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Author author)
+        public async  Task<ActionResult> Create(Author author)
         {
             bool isFailed = context.Authors.Any(i => 
                 i.FirstName.ToLower() == author.FirstName.ToLower() &&
@@ -46,8 +47,8 @@ namespace Files.Controllers
             }
             try
             {
-                context.Add(author);
-                context.SaveChanges();
+                await context.AddAsync(author);
+                await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), "Home");
             }
             catch
@@ -58,17 +59,17 @@ namespace Files.Controllers
         }
 
         // GET: AuthorController/Edit/5
-        public ActionResult Edit(int id, bool isFailed = false)
+        public async Task<ActionResult> Edit(int id, bool isFailed = false)
         {
             ViewBag.IsFailed = isFailed;
-            var author = context.Authors.Find(id);
+            var author = await context.Authors.FindAsync(id);
             return View(author);
         }
 
         // POST: AuthorController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Author author)
+        public async Task<ActionResult> Edit(Author author)
         {
             bool isFailed = context.Authors.Any(i =>
                 i.FirstName.ToLower() == author.FirstName.ToLower() &&
@@ -84,7 +85,7 @@ namespace Files.Controllers
             try
             {
                 context.Authors.Update(author);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -94,18 +95,18 @@ namespace Files.Controllers
         }
 
         // GET: AuthorController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var isFailed = context.WPDs.Any(w => w.Author.Id == id);
             if(isFailed)
             {
                 TempData["Message"] =  
-                    "Невозможно удалить преподавателя, т.к. за ним закреплена как минимум одна дисциплина!\nМожно удалить только тех преподавателей, котоыре не являются авторами той или иной РПД!";
+                    "Невозможно удалить преподавателя, т.к. за ним закреплена как минимум одна дисциплина!\nМожно удалить только тех преподавателей, которые не являются авторами той или иной РПД!";
                 return RedirectToAction(nameof(Index), new { isFailed = isFailed });
             }
-            var author = context.Authors.Find(id);
+            var author = await context.Authors.FindAsync(id);
             context.Authors.Remove(author);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

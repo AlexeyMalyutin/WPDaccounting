@@ -34,9 +34,11 @@ namespace Files.Models
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DateOfFormalApproval { get; set; }
         
-        [Required(ErrorMessage = "Введите учебный год")]
-        [Display(Name = "Учебный год")]
-        public int Year { get; set; }
+        [Required(ErrorMessage = "Введите учебные года")]
+        [RegularExpression(@"\d{4}[-/:]\d{4}", ErrorMessage = "Некорректый ввод. Введите два года через символы '-', ':' или '/'.\nПример: 2019-2023")]
+        [Display(Name = "Учебные года")]
+        public string Year { get; set; }
+
         [Required(ErrorMessage = "Введите название специальности")]
         [Display(Name = "Специальность")]
         public string Specialization { get; set; }

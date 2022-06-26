@@ -105,6 +105,7 @@
                         <th>Автор</th>
                         <th>Дата утверждения</th>
                         <th>Дата формального утверждения</th>
+                        <th>Учебный год</th>
                         <th>Статус</th>
                         <th>Специальность</th>
                         <th>Профиль</th>
@@ -123,6 +124,7 @@
                         <td>@file.Author.Name</td>
                         <td>@Html.DisplayFor(modelItem => file.DateOfApproval)</td>
                         <td>@Html.DisplayFor(modelItem => file.DateOfFormalApproval)</td>
+                        <td>@file.Year</td>
                         <td>@file.Status</td>
                         <td>@file.Specialization</td>
                         <td>@file.Subspecialization</td>
