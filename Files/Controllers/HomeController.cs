@@ -147,8 +147,10 @@ namespace Files.Controllers
         {
             if (wpdModel.File != null)
             {
-                var basePath = Path.Combine(Directory.GetCurrentDirectory(),"Files");
-                var filePath = Path.Combine(basePath, wpdModel.File.FileName);
+                string basePath = Path.Combine(Directory.GetCurrentDirectory(), "Files");
+                if (!Directory.Exists(basePath)) Directory.CreateDirectory(basePath);
+
+                string filePath = Path.Combine(basePath, wpdModel.File.FileName);
 
                 if (!System.IO.File.Exists(filePath))
                 {
