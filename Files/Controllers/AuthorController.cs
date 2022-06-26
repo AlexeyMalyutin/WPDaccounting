@@ -15,16 +15,12 @@ namespace Files.Controllers
         {
             this.context = context;
         }
-        public ActionResult Index()
+        public ActionResult Index(bool isFailed = false)
         {
+            ViewBag.IsFailed = isFailed;
+            ViewBag.Message = TempData["Message"];
             var authors = context.Authors.ToList();
             return View(authors);
-        }
-
-        // GET: AuthorController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
         }
 
         // GET: AuthorController/Create
@@ -38,12 +34,12 @@ namespace Files.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(Author author)
         {
-            var isFailed = context.Authors.Any(
-                i => i.FirstName == author.FirstName &&
-                i.LastName == author.LastName &&
-                i.Patronymic == author.Patronymic &&
+            bool isFailed = context.Authors.Any(i => 
+                i.FirstName.ToLower() == author.FirstName.ToLower() &&
+                i.LastName.ToLower() == author.LastName.ToLower() &&
+                i.Patronymic.ToLower() == author.Patronymic.ToLower() &&
                 i.Department == author.Department);
-
+            
             if (isFailed)
             {
                 return RedirectToAction(nameof(Create), new { isFailed = true });
@@ -62,8 +58,9 @@ namespace Files.Controllers
         }
 
         // GET: AuthorController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int id, bool isFailed = false)
         {
+            ViewBag.IsFailed = isFailed;
             var author = context.Authors.Find(id);
             return View(author);
         }
@@ -73,6 +70,17 @@ namespace Files.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Author author)
         {
+            bool isFailed = context.Authors.Any(i =>
+                i.FirstName.ToLower() == author.FirstName.ToLower() &&
+                i.LastName.ToLower() == author.LastName.ToLower() &&
+                i.Patronymic.ToLower() == author.Patronymic.ToLower() &&
+                i.Department == author.Department);
+
+            if (isFailed)
+            {
+                return RedirectToAction(nameof(Edit), new {id = author.Id, isFailed = isFailed });
+            }
+
             try
             {
                 context.Authors.Update(author);
@@ -88,6 +96,13 @@ namespace Files.Controllers
         // GET: AuthorController/Delete/5
         public ActionResult Delete(int id)
         {
+            var isFailed = context.WPDs.Any(w => w.Author.Id == id);
+            if(isFailed)
+            {
+                TempData["Message"] =  
+                    "Невозможно удалить преподавателя, т.к. за ним закреплена как минимум одна дисциплина!\nМожно удалить только тех преподавателей, котоыре не являются авторами той или иной РПД!";
+                return RedirectToAction(nameof(Index), new { isFailed = isFailed });
+            }
             var author = context.Authors.Find(id);
             context.Authors.Remove(author);
             context.SaveChanges();
